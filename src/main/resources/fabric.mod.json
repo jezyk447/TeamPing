@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "teamping",
+  "version": "${version}",
+  "name": "TeamPing",
+  "description": "Każdy widzi twoje znaczniki",
+  "icon": "assets/teamping/icon.png",
+  "authors": [
+    "jezyk_2137",
+    "Bendzamin"
+  ],
+  "license": "LicenseRef-TeamPing-ARR",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["pl.teamping.TeamPingMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "${minecraft_dep}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

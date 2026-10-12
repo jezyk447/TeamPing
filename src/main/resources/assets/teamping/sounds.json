@@ -1,0 +1,8 @@
+{
+  "ping1": { "category": "player", "sounds": [{ "name": "teamping:ping1", "stream": false }] },
+  "ping2": { "category": "player", "sounds": [{ "name": "teamping:ping2", "stream": false }] },
+  "ping3": { "category": "player", "sounds": [{ "name": "teamping:ping3", "stream": false }] },
+  "click1": { "category": "master", "sounds": [{ "name": "teamping:click1", "stream": false }] },
+  "click2": { "category": "master", "sounds": [{ "name": "teamping:click2", "stream": false }] },
+  "click3": { "category": "master", "sounds": [{ "name": "teamping:click3", "stream": false }] }
+}

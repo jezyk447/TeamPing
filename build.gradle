@@ -1,0 +1,65 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name + "-" + project.minecraft_version
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    // Zakres wersji MC musi odpowiadac profilowi, pod ktory budujemy. Jeden jar NIE dziala
+    // na 1.21.4 i 1.21.8 naraz (m.in. DrawContext.drawText zmienil typ zwracany int -> void),
+    // wiec Fabric ma odrzucic zly jar zamiast pozwolic mu sie wywalic w trakcie renderu.
+    inputs.property "minecraft_dep", project.minecraft_dep
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version,
+               "minecraft_dep": inputs.properties.minecraft_dep
+    }
+    // Wersja wypieczona takze jako osobny zasob - czyta ja TeamPingMod.VERSION, gdy mod jest
+    // ladowany jako payload loadera (FabricLoader zna wtedy tylko wersje loadera, nie moda).
+    filesMatching("teamping.version") {
+        expand "version": inputs.properties.version
+    }
+}
+
+def mcv = project.minecraft_version
+
+// Gotowy jar (remapJar) kopiujemy do dist/ pod finalna nazwa, poza katalog build/
+// (clean go nie kasuje). Zwykly, czytelny mod Fabric - bez obfuskacji.
+tasks.register('dist', Copy) {
+    dependsOn tasks.remapJar
+    from(tasks.remapJar) { rename { "${project.archives_base_name}-${mcv}-${project.mod_version}.jar" } }
+    into rootProject.file('dist')
+}
+tasks.named('build') { finalizedBy 'dist' }
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 21
+}
+
+// Kod zalezny od wersji MC (IconBackend). Loom remapuje go razem z reszta, wiec w gotowym
+// jarze nazwy sa poprawne - inaczej niz przy refleksji po nazwach z mapowan nazwanych.
+sourceSets.main.java.srcDir "src/compat/${project.minecraft_version}/java"
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
